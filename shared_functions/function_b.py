@@ -12,7 +12,7 @@ try:
 except:
     pass
 
-from app import app
+from processing_module.app import app
 
 TOPIC = 'raw-event'
 SINK = 'agg-event-b'
