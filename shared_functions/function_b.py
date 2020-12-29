@@ -4,8 +4,15 @@ import faust
 import logging
 import random
 import statistics as stats
+import imp
+import sys
 
-from processing_module.app import app
+try:
+    sys.path.append('../data_processing/processing_module')
+except:
+    pass
+
+from app import app
 
 TOPIC = 'raw-event'
 SINK = 'agg-event-b'

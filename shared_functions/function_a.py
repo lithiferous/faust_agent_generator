@@ -4,8 +4,12 @@ import faust
 import logging
 import random
 
-from processing_module.function_a.models import *
-from processing_module.app import app
+try:
+    sys.path.append('../data_processing/processing_module')
+except:
+    pass
+
+from app import app
 logger = logging.getLogger(__name__)
 
 TOPIC = 'raw-event'
@@ -16,6 +20,7 @@ WINDOW = 5
 WINDOW_EXPIRES = 10
 PARTITIONS = 1
 
+
 class RawModel(faust.Record):
     date: datetime
     value: float
@@ -25,6 +30,7 @@ class AggModelA(faust.Record):
     date: datetime
     count: int
     mean: float
+
 
 app.conf.table_cleanup_interval = CLEANUP_INTERVAL
 source = app.topic(TOPIC, partitions=PARTITIONS, value_type=RawModel)

@@ -21,6 +21,7 @@ services:
       - "8084:80"
       - "8000:8000"
     volumes:
+      - ./shared_functions:/data_processing/processing_module
       - ./scripts:/data_processing/scripts
   zookeeper:
     image: "confluentinc/cp-zookeeper"

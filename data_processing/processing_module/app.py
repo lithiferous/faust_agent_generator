@@ -1,15 +1,15 @@
 import faust
 
-from simple_settings import settings
+from settings import APP_ID, KAFKA_BOOTSTRAP_SERVER, LOGGING
 from logging.config import dictConfig
 
 app = faust.App(
     version=1,
     autodiscover=True,
     origin='processing_module',
-    id="1",
-    broker=settings.KAFKA_BOOTSTRAP_SERVER,
-    logging_config=dictConfig(settings.LOGGING),
+    id=APP_ID,
+    broker=KAFKA_BOOTSTRAP_SERVER,
+    logging_config=dictConfig(LOGGING),
 )
 
 

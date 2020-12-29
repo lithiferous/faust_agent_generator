@@ -1,5 +1,0 @@
-{%- for k,vZQ in extract -%}
-if {{ process['extract'] }}:
-    print({{ process['extract'] }})
-    return {{ process['extract'] }}
-{% endfor %}
