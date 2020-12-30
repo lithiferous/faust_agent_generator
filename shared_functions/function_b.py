@@ -2,17 +2,16 @@ from datetime import datetime, timedelta
 from time import time
 import faust
 import logging
+import os
 import random
 import statistics as stats
-import imp
 import sys
 
-try:
+if os.environ.get('DEV') is None:
     sys.path.append('../data_processing/processing_module')
-except:
-    pass
 
 from processing_module.app import app
+logger = logging.getLogger(__name__)
 
 TOPIC = 'raw-event'
 SINK = 'agg-event-b'
@@ -21,7 +20,6 @@ CLEANUP_INTERVAL = 7.5
 WINDOW = 3
 WINDOW_EXPIRES = 10
 PARTITIONS = 1
-logger = logging.getLogger(__name__)
 
 
 class RawModel(faust.Record):

@@ -2,12 +2,13 @@ from datetime import datetime, timedelta
 from time import time
 import faust
 import logging
+import os
+import pytest
 import random
+import sys
 
-try:
-    sys.path.append('../data_processing/processing_module')
-except:
-    pass
+if os.environ.get('DEV') is None:
+    sys.path.append('../data_processing')
 
 from processing_module.app import app
 logger = logging.getLogger(__name__)
@@ -69,8 +70,35 @@ async def print_windowed_events(stream):
         value_list = tumbling_table['events'].value()
         value_list.append(event)
         tumbling_table['events'] = value_list
+        yield event
 
 
 @app.timer(0.1)
 async def produce():
     await source.send(value=RawModel(value=random.random(), date=int(time())))
+
+
+@pytest.fixture()
+def test_app(event_loop):
+    app.finalize()
+    app.flow_control.resume()
+    return app
+
+
+@pytest.mark.asyncio()
+async def test_count_page_views(test_app):
+    app.conf.store = 'memory://'
+    async with print_windowed_events.test_context() as agent:
+        val, dt = random.random(), int(time())
+        load = RawModel(value=val, date=dt)
+        event = await agent.put(load)
+        assert tumbling_table[dt]
+        page_view = PageView(id='1', user='test')
+        page_view_2 = PageView(id='1', user='test2')
+        await agent.put(page_view)
+
+        # windowed table: we select window relative to the current event
+        assert page_views['1'] == 1
+
+        await agent.put(page_view_2)
+        assert page_views['1'] == 2
